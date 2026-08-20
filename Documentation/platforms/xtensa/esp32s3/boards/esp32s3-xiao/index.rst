@@ -258,3 +258,19 @@ Associate with a network and start the server:
 
 The server lists the contents of ``/mnt/sd0``, so captures can be browsed and
 downloaded from any browser on the same network.
+
+The XIAOML expansion board carries an LSM6DS3TR-C IMU, which is register
+compatible with the LSM6DSL and reports the same WHO_AM_I value, so that
+driver runs it unchanged.  It sits on the board's own I2C pads, a different
+bus from the camera's SCCB lines:
+
+========  ======
+Signal    GPIO
+========  ======
+SDA       5
+SCL       6
+========  ======
+
+The accelerometer is registered at ``/dev/imu0`` with I2C address 0x6a.  Only
+the accelerometer is exposed: the driver keeps the gyroscope behind an
+internal helper and does not export it.

@@ -173,6 +173,16 @@ int esp32s3_bringup(void)
     }
 #endif
 
+#ifdef CONFIG_SENSORS_LSM6DSL
+  /* Register the IMU carried by the expansion board */
+
+  ret = esp32s3_imu_initialize();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "ERROR: Failed to initialize IMU: %d\n", ret);
+    }
+#endif
+
 #ifdef CONFIG_ESPRESSIF_WIFI
   /* Bring up the WiFi interface */
 

@@ -44,6 +44,10 @@ ifeq ($(CONFIG_ESP32S3_SPI2),y)
 CSRCS += esp32s3_board_spi.c
 endif
 
+ifeq ($(CONFIG_SENSORS_LSM6DSL),y)
+CSRCS += esp32s3_board_imu.c
+endif
+
 DEPPATH += --dep-path board
 VPATH += :board
 CFLAGS += ${INCDIR_PREFIX}$(TOPDIR)$(DELIM)arch$(DELIM)$(CONFIG_ARCH)$(DELIM)src$(DELIM)board$(DELIM)board

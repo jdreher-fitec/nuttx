@@ -83,5 +83,17 @@ int esp32s3_gpio_init(void);
 int esp32s3_camera_initialize(void);
 #endif
 
+/****************************************************************************
+ * Name: esp32s3_imu_initialize
+ *
+ * Description:
+ *   Register the 6-axis IMU on the expansion board.
+ *
+ ****************************************************************************/
+
+#ifdef CONFIG_SENSORS_LSM6DSL
+int esp32s3_imu_initialize(void);
+#endif
+
 #endif /* __ASSEMBLY__ */
 #endif /* __BOARDS_XTENSA_ESP32S3_ESP32S3_XIAO_SRC_ESP32S3_XIAO_H */
