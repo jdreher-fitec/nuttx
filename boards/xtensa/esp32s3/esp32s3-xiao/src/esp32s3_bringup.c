@@ -53,6 +53,22 @@
 #  include <nuttx/leds/userled.h>
 #endif
 
+#ifdef CONFIG_MMCSD_SPI
+#  include "esp32s3_board_sdmmc.h"
+#endif
+
+#ifdef CONFIG_ESPRESSIF_WIFI
+#  include "esp32s3_board_wlan.h"
+#endif
+
+/****************************************************************************
+ * Pre-processor Definitions
+ ****************************************************************************/
+
+/* Mount point of the onboard microSD card slot */
+
+#define SD_MOUNT_PATH  "/mnt/sd0"
+
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
@@ -116,6 +132,54 @@ int esp32s3_bringup(void)
   if (ret < 0)
     {
       syslog(LOG_ERR, "ERROR: userled_lower_initialize() failed: %d\n", ret);
+    }
+#endif
+
+#ifdef CONFIG_MMCSD_SPI
+  /* Bind the onboard microSD slot to SPI and mount it.
+   *
+   * The XIAO ESP32S3 Sense wires the slot in SPI mode: CS/GPIO3, SCK/GPIO7,
+   * MISO/GPIO8 and MOSI/GPIO9.
+   */
+
+  ret = board_sdmmc_spi_initialize();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "ERROR: Failed to initialize SD card: %d\n", ret);
+    }
+  else
+    {
+      char blkdev[32];
+
+      snprintf(blkdev, sizeof(blkdev), "/dev/mmcsd%d",
+               CONFIG_NSH_MMCSDMINOR);
+
+      ret = nx_mount(blkdev, SD_MOUNT_PATH, "vfat", 0, NULL);
+      if (ret < 0)
+        {
+          syslog(LOG_ERR, "ERROR: Failed to mount %s at %s: %d\n",
+                 blkdev, SD_MOUNT_PATH, ret);
+        }
+    }
+#endif
+
+#ifdef CONFIG_ESP32S3_CAM
+  /* Initialize the DVP interface and the camera sensor drivers */
+
+  ret = esp32s3_camera_initialize();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "ERROR: Failed to initialize camera: %d\n", ret);
+    }
+#endif
+
+#ifdef CONFIG_ESPRESSIF_WIFI
+  /* Bring up the WiFi interface */
+
+  ret = board_wlan_init();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "ERROR: Failed to initialize WiFi: %d\n", ret);
     }
 #endif
 

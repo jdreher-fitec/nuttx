@@ -70,5 +70,18 @@ int esp32s3_bringup(void);
 int esp32s3_gpio_init(void);
 #endif
 
+/****************************************************************************
+ * Name: esp32s3_camera_initialize
+ *
+ * Description:
+ *   Initialize the DVP camera interface and register the camera sensor
+ *   drivers enabled in the configuration.
+ *
+ ****************************************************************************/
+
+#ifdef CONFIG_ESP32S3_CAM
+int esp32s3_camera_initialize(void);
+#endif
+
 #endif /* __ASSEMBLY__ */
 #endif /* __BOARDS_XTENSA_ESP32S3_ESP32S3_XIAO_SRC_ESP32S3_XIAO_H */
