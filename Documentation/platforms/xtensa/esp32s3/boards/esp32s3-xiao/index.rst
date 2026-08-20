@@ -199,3 +199,62 @@ D2/GPIO3   Input    /dev/gpio2
 
 
 
+
+camera
+------
+Configuration for the XIAO ESP32S3 **Sense** variant, which adds a camera
+module and a microSD card slot on its expansion board.  It enables the DVP
+camera interface, the OV5640 and OV3660 sensor drivers, the microSD slot, WiFi
+in station mode and an HTTP server, so captured frames can be written to the
+card and then downloaded over the network.
+
+Both camera drivers are registered at boot.  The capture framework probes each
+registered sensor over SCCB and binds to the one that acknowledges its chip ID,
+so the same image runs on either the OV3660 that ships with the board or an
+OV5640 module.
+
+This configuration only applies to the Sense variant; the peripherals below are
+not present on the plain XIAO ESP32S3.
+
+Camera (DVP) pins:
+
+=========  ======  =========  ======
+Signal     GPIO    Signal     GPIO
+=========  ======  =========  ======
+XCLK       10      Y8 (D6)    11
+PCLK       13      Y7 (D5)    12
+VSYNC      38      Y6 (D4)    14
+HREF       47      Y5 (D3)    16
+SIOD/SDA   40      Y4 (D2)    18
+SIOC/SCL   39      Y3 (D1)    17
+Y9 (D7)    48      Y2 (D0)    15
+=========  ======  =========  ======
+
+PWDN and RESET are not connected on this board.
+
+microSD slot (SPI2):
+
+========  ======
+Signal    GPIO
+========  ======
+CS        3
+SCK       7
+MISO      8
+MOSI      9
+========  ======
+
+The card is mounted at ``/mnt/sd0``.  There is no card detect line, so an
+absent card surfaces as an MMC/SD initialization failure at boot.
+
+Associate with a network and start the server:
+
+.. code-block:: console
+
+  nsh> wapi psk wlan0 <passphrase> 3
+  nsh> wapi essid wlan0 <ssid> 1
+  nsh> renew wlan0
+  nsh> ifconfig
+  nsh> webserver &
+
+The server lists the contents of ``/mnt/sd0``, so captures can be browsed and
+downloaded from any browser on the same network.
