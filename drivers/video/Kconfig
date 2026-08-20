@@ -498,6 +498,14 @@ config VIDEO_GC0308
 	---help---
 		GC0308 VGA CMOS image sensor with DVP interface.
 
+config VIDEO_OV5640
+	bool "OV5640 camera chip"
+	default n
+	select I2C
+	---help---
+		OmniVision OV5640 5MP CMOS image sensor with DVP interface.
+		Uses 16-bit register addressing over SCCB (I2C) at address 0x3c.
+
 config GOLDFISH_CAMERA
 	bool "Goldfish camera support"
 	depends on VIDEO
