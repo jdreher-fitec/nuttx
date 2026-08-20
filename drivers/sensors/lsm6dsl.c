@@ -382,19 +382,21 @@ static int lsm6dsl_sensor_start(FAR struct lsm6dsl_dev_s *priv)
 
   sninfo("Starting....");
 
-  /* Accelerometer config registers:
-   * Turn on the accelerometer: 833Hz, +- 16g
+  /* Accelerometer config registers: range and rate come from the
+   * configuration, along with the sensitivity that matches the range.
    */
 
-  lsm6dsl_writereg8(priv, LSM6DSL_CTRL1_XL, 0x74);
-  g_accelerofactor = 0.488;
+  lsm6dsl_writereg8(priv, LSM6DSL_CTRL1_XL,
+                    LSM6DSL_XL_ODR_BITS | LSM6DSL_XL_FS_BITS);
+  g_accelerofactor = LSM6DSL_XL_SENSITIVITY_MG;
 
-  /* Gyro config registers Turn on the gyro: FS=2000dps, ODR=833Hz Not using
-   * modifyreg with empty value!!!! Then read value first!!!
+  /* Gyro config registers.  Not using modifyreg with empty value!!!!
+   * Then read value first!!!
    */
 
-  lsm6dsl_writereg8(priv, LSM6DSL_CTRL2_G, 0x7c);
-  g_gyrofactor = 70;
+  lsm6dsl_writereg8(priv, LSM6DSL_CTRL2_G,
+                    LSM6DSL_G_ODR_BITS | LSM6DSL_G_FS_BITS);
+  g_gyrofactor = LSM6DSL_G_SENSITIVITY_MDPS;
 
   lsm6dsl_writereg8(priv, LSM6DSL_CTRL6_C, 0x00);
 
@@ -526,7 +528,7 @@ static int lsm6dsl_selftest(FAR struct lsm6dsl_dev_s *priv, uint32_t mode)
       lsm6dsl_writereg8(priv, LSM6DSL_CTRL1_XL, 0x00);
       lsm6dsl_writereg8(priv, LSM6DSL_CTRL2_G, 0x5c);
       lsm6dsl_writereg8(priv, LSM6DSL_CTRL3_C, 0x44);
-      g_gyrofactor = (70 / 1000); /* 2000dps */
+      g_gyrofactor = (70.0 / 1000); /* 2000dps */
       st_limit_min = LSM6DSL_MIN_ST_LIMIT_MDPS;
       st_limit_max = LSM6DSL_MAX_ST_LIMIT_MDPS;
     }
@@ -1253,6 +1255,40 @@ int lsm6dsl_sensor_register(FAR const char *devpath,
 
   return lsm6dsl_register(devpath, i2c, addr, &g_lsm6dsl_sensor_ops,
                           LSM6DSL_OUTX_L_XL_SHIFT, sensor_data);
+}
+
+/****************************************************************************
+ * Name: lsm6dsl_sensor_register_gyro
+ *
+ * Description:
+ *   Register the LSM6DSL gyroscope character device as 'devpath'.
+ *
+ *   Accelerometer and gyroscope share one device on the bus and are both
+ *   started by lsm6dsl_sensor_start(); registering them separately just
+ *   exposes the two output register banks as two character devices.
+ *
+ * Input Parameters:
+ *   devpath - The full path to the driver to register,
+ *             e.g. "/dev/gyro0".
+ *   i2c     - An I2C driver instance.
+ *   addr    - The I2C address of the LSM6DSL.
+ *
+ * Returned Value:
+ *   Zero (OK) on success; a negated errno value on failure.
+ *
+ ****************************************************************************/
+
+int lsm6dsl_sensor_register_gyro(FAR const char *devpath,
+                                 FAR struct i2c_master_s *i2c, uint8_t addr)
+{
+  struct lsm6dsl_sensor_data_s sensor_data;
+
+  DEBUGASSERT(addr == LSM6DSLACCEL_ADDR0 || addr == LSM6DSLACCEL_ADDR1);
+
+  sninfo("Trying to register gyro\n");
+
+  return lsm6dsl_register(devpath, i2c, addr, &g_lsm6dsl_sensor_ops,
+                          LSM6DSL_OUTX_L_G_SHIFT, sensor_data);
 }
 
 #endif /* CONFIG_I2C && CONFIG_SENSORS_LSM6DSL */

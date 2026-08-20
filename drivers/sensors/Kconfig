@@ -1034,6 +1034,106 @@ config LSM6DSL_I2C_FREQUENCY
 	range 1 400000
 	depends on SENSORS_LSM6DSL
 
+if SENSORS_LSM6DSL
+
+choice
+	prompt "LSM6DSL accelerometer full scale"
+	default LSM6DSL_XL_FS_4G
+	---help---
+		Smaller ranges resolve finer motion; larger ranges avoid clipping on
+		impacts.
+
+config LSM6DSL_XL_FS_2G
+	bool "+/-2 g"
+
+config LSM6DSL_XL_FS_4G
+	bool "+/-4 g"
+
+config LSM6DSL_XL_FS_8G
+	bool "+/-8 g"
+
+config LSM6DSL_XL_FS_16G
+	bool "+/-16 g"
+
+endchoice
+
+choice
+	prompt "LSM6DSL accelerometer output data rate"
+	default LSM6DSL_XL_ODR_52HZ
+	---help---
+		Higher rates cost power and storage.  Slow phenomena such as animal
+		behaviour are well served by tens of hertz.
+
+config LSM6DSL_XL_ODR_12_5HZ
+	bool "12.5 Hz"
+
+config LSM6DSL_XL_ODR_26HZ
+	bool "26 Hz"
+
+config LSM6DSL_XL_ODR_52HZ
+	bool "52 Hz"
+
+config LSM6DSL_XL_ODR_104HZ
+	bool "104 Hz"
+
+config LSM6DSL_XL_ODR_208HZ
+	bool "208 Hz"
+
+config LSM6DSL_XL_ODR_416HZ
+	bool "416 Hz"
+
+config LSM6DSL_XL_ODR_833HZ
+	bool "833 Hz"
+
+endchoice
+
+choice
+	prompt "LSM6DSL gyroscope full scale"
+	default LSM6DSL_G_FS_500DPS
+
+config LSM6DSL_G_FS_250DPS
+	bool "250 dps"
+
+config LSM6DSL_G_FS_500DPS
+	bool "500 dps"
+
+config LSM6DSL_G_FS_1000DPS
+	bool "1000 dps"
+
+config LSM6DSL_G_FS_2000DPS
+	bool "2000 dps"
+
+endchoice
+
+choice
+	prompt "LSM6DSL gyroscope output data rate"
+	default LSM6DSL_G_ODR_52HZ
+
+config LSM6DSL_G_ODR_12_5HZ
+	bool "12.5 Hz"
+
+config LSM6DSL_G_ODR_26HZ
+	bool "26 Hz"
+
+config LSM6DSL_G_ODR_52HZ
+	bool "52 Hz"
+
+config LSM6DSL_G_ODR_104HZ
+	bool "104 Hz"
+
+config LSM6DSL_G_ODR_208HZ
+	bool "208 Hz"
+
+config LSM6DSL_G_ODR_416HZ
+	bool "416 Hz"
+
+config LSM6DSL_G_ODR_833HZ
+	bool "833 Hz"
+
+endchoice
+
+endif # SENSORS_LSM6DSL
+
 config SENSORS_LSM6DSO32
 	bool "LSM6DSO32 support"
 	default n

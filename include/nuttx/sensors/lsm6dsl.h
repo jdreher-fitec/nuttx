@@ -848,6 +848,74 @@ struct lsm6dsl_dev_s
   struct lsm6dsl_sensor_data_s    sensor_data; /* Sensor data container     */
 };
 
+/* Selected ranges and the sensitivity that goes with them.
+ *
+ * These are the single source of truth for the scaling: the driver programs
+ * the control registers from them, and applications converting the raw counts
+ * returned by read() use the same values, so a configuration change cannot
+ * leave the two disagreeing.
+ */
+
+#if defined(CONFIG_LSM6DSL_XL_FS_2G)
+#  define LSM6DSL_XL_FS_BITS        LSM6DSL_CTRL1_XL_FS_XL_2G
+#  define LSM6DSL_XL_SENSITIVITY_MG 0.061f
+#elif defined(CONFIG_LSM6DSL_XL_FS_8G)
+#  define LSM6DSL_XL_FS_BITS        LSM6DSL_CTRL1_XL_FS_XL_8G
+#  define LSM6DSL_XL_SENSITIVITY_MG 0.244f
+#elif defined(CONFIG_LSM6DSL_XL_FS_16G)
+#  define LSM6DSL_XL_FS_BITS        LSM6DSL_CTRL1_XL_FS_XL_16G
+#  define LSM6DSL_XL_SENSITIVITY_MG 0.488f
+#else /* CONFIG_LSM6DSL_XL_FS_4G */
+#  define LSM6DSL_XL_FS_BITS        LSM6DSL_CTRL1_XL_FS_XL_4G
+#  define LSM6DSL_XL_SENSITIVITY_MG 0.122f
+#endif
+
+#if defined(CONFIG_LSM6DSL_XL_ODR_12_5HZ)
+#  define LSM6DSL_XL_ODR_BITS LSM6DSL_CTRL1_XL_ODR_XL_12_5HZ_12_5HZ
+#elif defined(CONFIG_LSM6DSL_XL_ODR_26HZ)
+#  define LSM6DSL_XL_ODR_BITS LSM6DSL_CTRL1_XL_ODR_XL_26HZ_26HZ
+#elif defined(CONFIG_LSM6DSL_XL_ODR_104HZ)
+#  define LSM6DSL_XL_ODR_BITS LSM6DSL_CTRL1_XL_ODR_XL_104HZ_104HZ
+#elif defined(CONFIG_LSM6DSL_XL_ODR_208HZ)
+#  define LSM6DSL_XL_ODR_BITS LSM6DSL_CTRL1_XL_ODR_XL_208HZ_208HZ
+#elif defined(CONFIG_LSM6DSL_XL_ODR_416HZ)
+#  define LSM6DSL_XL_ODR_BITS LSM6DSL_CTRL1_XL_ODR_XL_416HZ_416HZ
+#elif defined(CONFIG_LSM6DSL_XL_ODR_833HZ)
+#  define LSM6DSL_XL_ODR_BITS LSM6DSL_CTRL1_XL_ODR_XL_833HZ_833HZ
+#else /* CONFIG_LSM6DSL_XL_ODR_52HZ */
+#  define LSM6DSL_XL_ODR_BITS LSM6DSL_CTRL1_XL_ODR_XL_52HZ_52HZ
+#endif
+
+#if defined(CONFIG_LSM6DSL_G_FS_250DPS)
+#  define LSM6DSL_G_FS_BITS          LSM6DSL_CTRL2_G_FS_G_250DPS
+#  define LSM6DSL_G_SENSITIVITY_MDPS 8.75f
+#elif defined(CONFIG_LSM6DSL_G_FS_1000DPS)
+#  define LSM6DSL_G_FS_BITS          LSM6DSL_CTRL2_G_FS_G_1000DPS
+#  define LSM6DSL_G_SENSITIVITY_MDPS 35.0f
+#elif defined(CONFIG_LSM6DSL_G_FS_2000DPS)
+#  define LSM6DSL_G_FS_BITS          LSM6DSL_CTRL2_G_FS_G_2000DPS
+#  define LSM6DSL_G_SENSITIVITY_MDPS 70.0f
+#else /* CONFIG_LSM6DSL_G_FS_500DPS */
+#  define LSM6DSL_G_FS_BITS          LSM6DSL_CTRL2_G_FS_G_500DPS
+#  define LSM6DSL_G_SENSITIVITY_MDPS 17.5f
+#endif
+
+#if defined(CONFIG_LSM6DSL_G_ODR_12_5HZ)
+#  define LSM6DSL_G_ODR_BITS LSM6DSL_CTRL2_G_ODR_G_12_5HZ_12_5HZ
+#elif defined(CONFIG_LSM6DSL_G_ODR_26HZ)
+#  define LSM6DSL_G_ODR_BITS LSM6DSL_CTRL2_G_ODR_G_26HZ_26HZ
+#elif defined(CONFIG_LSM6DSL_G_ODR_104HZ)
+#  define LSM6DSL_G_ODR_BITS LSM6DSL_CTRL2_G_ODR_G_104HZ_104HZ
+#elif defined(CONFIG_LSM6DSL_G_ODR_208HZ)
+#  define LSM6DSL_G_ODR_BITS LSM6DSL_CTRL2_G_ODR_G_208HZ_208HZ
+#elif defined(CONFIG_LSM6DSL_G_ODR_416HZ)
+#  define LSM6DSL_G_ODR_BITS LSM6DSL_CTRL2_G_ODR_G_416HZ_416HZ
+#elif defined(CONFIG_LSM6DSL_G_ODR_833HZ)
+#  define LSM6DSL_G_ODR_BITS LSM6DSL_CTRL2_G_ODR_G_833HZ_833HZ
+#else /* CONFIG_LSM6DSL_G_ODR_52HZ */
+#  define LSM6DSL_G_ODR_BITS LSM6DSL_CTRL2_G_ODR_G_52HZ_52HZ
+#endif
+
 /****************************************************************************
  * Public Function Prototypes
  ****************************************************************************/
@@ -876,6 +944,18 @@ extern "C"
 int lsm6dsl_sensor_register(FAR const char *devpath,
                             FAR struct i2c_master_s *i2c,
                             uint8_t addr);
+
+/****************************************************************************
+ * Name: lsm6dsl_sensor_register_gyro
+ *
+ * Description:
+ *   Register the LSM6DSL gyroscope character device as 'devpath'.
+ *
+ ****************************************************************************/
+
+int lsm6dsl_sensor_register_gyro(FAR const char *devpath,
+                                 FAR struct i2c_master_s *i2c,
+                                 uint8_t addr);
 
 #ifdef __cplusplus
 }

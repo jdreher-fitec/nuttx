@@ -47,7 +47,8 @@
 
 #define IMU_I2C_PORT   1
 
-#define IMU_DEVPATH    "/dev/imu0"
+#define IMU_ACCEL_DEVPATH  "/dev/imu0"
+#define IMU_GYRO_DEVPATH   "/dev/gyro0"
 
 /****************************************************************************
  * Public Functions
@@ -63,8 +64,9 @@
  *   LSM6DSL this driver was written for and reports the same WHO_AM_I value
  *   (0x6a), so the existing driver drives it unchanged.
  *
- *   Only the accelerometer is registered: the driver keeps the gyroscope
- *   behind its internal register helper and does not export it.
+ *   Accelerometer and gyroscope are one device on the bus, both started
+ *   together, and are exposed as two character devices reading the two
+ *   output register banks.
  *
  * Returned Value:
  *   Zero (OK) on success; a negated errno value on failure.
@@ -83,13 +85,24 @@ int esp32s3_imu_initialize(void)
       return -ENODEV;
     }
 
-  ret = lsm6dsl_sensor_register(IMU_DEVPATH, i2c, LSM6DSLACCEL_ADDR0);
+  ret = lsm6dsl_sensor_register(IMU_ACCEL_DEVPATH, i2c, LSM6DSLACCEL_ADDR0);
   if (ret < 0)
     {
-      snerr("ERROR: Failed to register IMU at %s: %d\n", IMU_DEVPATH, ret);
+      snerr("ERROR: Failed to register accelerometer at %s: %d\n",
+            IMU_ACCEL_DEVPATH, ret);
       return ret;
     }
 
-  sninfo("IMU registered at %s\n", IMU_DEVPATH);
+  ret = lsm6dsl_sensor_register_gyro(IMU_GYRO_DEVPATH, i2c,
+                                     LSM6DSLACCEL_ADDR0);
+  if (ret < 0)
+    {
+      snerr("ERROR: Failed to register gyroscope at %s: %d\n",
+            IMU_GYRO_DEVPATH, ret);
+      return ret;
+    }
+
+  sninfo("IMU registered at %s and %s\n", IMU_ACCEL_DEVPATH,
+         IMU_GYRO_DEVPATH);
   return OK;
 }

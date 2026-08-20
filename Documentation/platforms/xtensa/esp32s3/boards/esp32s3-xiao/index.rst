@@ -271,6 +271,13 @@ SDA       5
 SCL       6
 ========  ======
 
-The accelerometer is registered at ``/dev/imu0`` with I2C address 0x6a.  Only
-the accelerometer is exposed: the driver keeps the gyroscope behind an
-internal helper and does not export it.
+The accelerometer is registered at ``/dev/imu0`` and the gyroscope at
+``/dev/gyro0``, both at I2C address 0x6a.  They are one device on the bus,
+started together, exposed as two character devices reading the two output
+register banks.
+
+Ranges and rates are selected through ``CONFIG_LSM6DSL_XL_*`` and
+``CONFIG_LSM6DSL_G_*``.  This configuration uses +/-4 g and 500 dps at 52 Hz,
+which suits animal behaviour recording: fine enough to resolve slow movement,
+with headroom for impacts, and far cheaper in power and storage than the
+kilohertz rates the sensor can reach.
