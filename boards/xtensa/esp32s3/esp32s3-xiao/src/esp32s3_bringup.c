@@ -173,6 +173,19 @@ int esp32s3_bringup(void)
     }
 #endif
 
+#ifdef CONFIG_I2C_DRIVER
+  /* Expose the I2C buses to user space, so their devices can be probed from
+   * the shell: the camera's SCCB lines on I2C0, and the expansion board on
+   * I2C1.
+   */
+
+  ret = board_i2c_init();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "ERROR: Failed to register I2C buses: %d\n", ret);
+    }
+#endif
+
 #ifdef CONFIG_SENSORS_LSM6DSL
   /* Register the IMU carried by the expansion board */
 

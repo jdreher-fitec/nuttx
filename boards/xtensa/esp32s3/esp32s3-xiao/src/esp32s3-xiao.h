@@ -71,6 +71,19 @@ int esp32s3_gpio_init(void);
 #endif
 
 /****************************************************************************
+ * Name: board_i2c_init
+ *
+ * Description:
+ *   Register the configured I2C buses as /dev/i2cN, so their devices can be
+ *   probed from user space.
+ *
+ ****************************************************************************/
+
+#ifdef CONFIG_I2C_DRIVER
+int board_i2c_init(void);
+#endif
+
+/****************************************************************************
  * Name: esp32s3_camera_initialize
  *
  * Description:
